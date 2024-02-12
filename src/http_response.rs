@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use std::fmt;
+use std::io::prelude::*;
+use std::net::TcpStream;
 
 use crate::constants;
 
@@ -24,15 +26,19 @@ impl HttpResponse {
         self.headers.insert(name.to_string(), content.to_string());
     }
 
-    pub fn remove_header(&mut self, name: &str) {
-        self.headers.remove(name);
-    }
+    // pub fn remove_header(&mut self, name: &str) {
+    //     self.headers.remove(name);
+    // }
 
     pub fn set_body(&mut self, body: String) {
         let length = body.len();
 
         self.set_header("Content-Length", &length.to_string());
         self.body = Some(body);
+    }
+
+    pub fn send(self, stream: &mut TcpStream) {
+        stream.write_all(self.to_string().as_bytes()).unwrap()
     }
 }
 
