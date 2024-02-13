@@ -1,4 +1,5 @@
-use std::fs;
+use std::time::Duration;
+use std::{fs, thread};
 use std::net::{TcpListener, TcpStream};
 
 mod constants;
@@ -33,6 +34,11 @@ fn handle_connection(mut stream: TcpStream) {
         } else {
             format!("html{uri}")
         };
+
+        // Simulate slow request
+        if uri.contains("sleep") {
+            thread::sleep(Duration::from_secs(5));
+        }
 
         if let Ok(content) = fs::read_to_string(path) {
             let mut res = HttpResponse::new(200, "OK");
