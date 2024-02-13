@@ -1,21 +1,26 @@
+use std::net::{TcpListener, TcpStream};
 use std::time::Duration;
 use std::{fs, thread};
-use std::net::{TcpListener, TcpStream};
 
 mod constants;
 mod http_request;
 mod http_response;
+mod thread_pool;
 
 use http_request::HttpRequest;
 use http_response::HttpResponse;
+use thread_pool::ThreadPool;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
+    let pool = ThreadPool::new(4);
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
-        handle_connection(stream);
+        pool.run(|| {
+            handle_connection(stream);
+        })
     }
 }
 
